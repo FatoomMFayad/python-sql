@@ -1,21 +1,39 @@
 import pandas as pd
 import sqlite3 as sq
 import os
+import logging
 
-#load file
-chess_url = 'https://drive.google.com/file/d/1eR3NZtwIC6ECN3vhtrynqmx8okG0twA7/view'
-chess_url='https://drive.google.com/uc?id=' + chess_url.split('/')[-2]
-def load_data(url: str, local_path: str)-> pd.DataFrame:
-    if os.path.exists(local_path):
-        print(f'Loading from cache: {local_path}')
-        return pd.read_csv(local_path)
-    print(f'Downloading from {url}...')
-    df = pd.read_csv(url)
-    os.makedirs(os.path.dirname(local_path), exist_ok=True)
-    df.to_csv(local_path, index=False)
-    print(f'Saved to {local_path}')
-    return df
+log = logging.getLogger(__name__)
 
-chess_df = load_data(chess_url, 'chess_db/data/raw/chess_games.csv')
+#Step 0: Create Schema
+def create_schema(conn:sq.Connection)->None:
+    """
+    We need to create and normalize 3 tables out of the csv data:
+    Players, Openings, Games
+
+    Define all three tables with explicit types, PRIMARY KEYS,
+    FORIEGN KEYs, NOT NULL constraints, and CHECK constraints.
+
+    Why explicit CREATE TABLE instead of letting to_sql infer?
+    - to_sql creates column with no constraints whatsover
+    -FK relationships would exists in comments only, not enforced
+    -CHECK constraints (winner IN(...), turns>=1) would be absent
+    -NOT NULL would not be set on ny column
+    -Column types would be SQLite affinity guesses, not intentional choices
+
+    Insertion order matters:
+     players and openinings must exists before games,
+     becuse games has FK references to both.
+    """
+
+    conn.execute("DROP TABLE IF EXISTS games")
+    conn.execute("DROP TABLE IF EXISTS openings")
+    conn.execute("DROP TABLE IF EXISTS players")
+
+
+
+
+
+
 
 
