@@ -198,6 +198,19 @@ def query(conn: sqlite3.Connection, sql: str) -> pd.DataFrame:
 
 def run_assignment(conn: sqlite3.Connection) -> None:
     """Stage 1 to 4 then Q1 to Q5"""
+    # Stage1 
+    # Q1 number of games and number of rated games
+    # number of games
+    sql_total = "SELECT COUNT(*) AS total_games FROM games"
+    df_total = query(conn, sql_total)
+    print(f"Total numbers of games: {df_total['total_games'][0]}")
+    # rated games
+    rated_total_str = "Select COUNT(*) AS total_rated FROM games WHERE rated = TRUE"
+    rated_total = query(conn, rated_total_str)
+    print(f"Total numbers of rated games: {rated_total['total_rated'][0]}")
+
+    
+    
     # Make sure to use the function query we built above! -Hend
 
 
@@ -225,7 +238,7 @@ def main():
     log.info(f"Database tables have been built. {os.path.getsize(db_path)/1024:.2f} KB" )
 
     # call the asignment function to run the queries
-    
+    run_assignment(conn)
     conn.close()
 
 if __name__ == "__main__":
