@@ -37,7 +37,7 @@ def create_schema(conn:sq.Connection)->None:
                  username   TEXT    PRIMARY KEY NOT NULL,
                  last_rating    INTEGER NOT NULL,
                  total_games    INTEGER NOT NULL DEFAULT 0
-                 )
+        )
     """)
 
     # Openings: one row per unique opening code.
@@ -46,7 +46,33 @@ def create_schema(conn:sq.Connection)->None:
             opening_code    TEXT PRIMARY KEY NOT NULL,
             opening_shotname    TEXT NOT NULL,
             opening_fullname    TEXT NOT NULL
-                 )
+        )
+    """)
+    # Games: The core table
+    # White_id and Balck_id are foreign keys to players.username
+    # Opening_code is a foreign key to openings.opening_code
+    # I gonna keep the ratings even though in normalizatio we can derive them from players.
+    # This is a delibrte de-normalization for analytical convenience.
+    conn.execute("""
+        CREATE TABLE games(
+            game_id         INTEGER PRIMARY KEY NOT NULL,
+            white_id        TEXT    NOT NULL
+                                REFERENCES players(username),
+            black_id        TEXT    NOT NULL
+                                REFERENCES players(username),
+            winner          TEXT    NOT NULL
+                                CHECK(winner IN('White', 'Black', 'Draw')),
+            victory_status  TEXT    NOT NULL,
+            turns           INTEGER NOT NULL
+                                CHECK(turns >= 1),
+            time_increment  TEXT    NOT NULL,
+            rated           INTEGER NOT NULL
+                                CHECK(rated in (0, 1)),
+            opening_code    TEXT    NOT NULL
+                                REFERENCES openings(opening_code),
+            white_rating    INTEGER NOT NULL,
+            black_rating    INTEGER NOT NULL
+        )
     """)
 
 
