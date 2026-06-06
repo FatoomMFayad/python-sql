@@ -209,6 +209,7 @@ def run_assignment(conn: sqlite3.Connection) -> None:
     rated_total = query(conn, rated_total_str)
     print(f"Total numbers of rated games: {rated_total['total_rated'][0]}")
 
+    # Stage 2
     #Q2 List all distinct victory_status values and their counts.
     victory_status_str = "SELECT DISTINCT victory_status, COUNT(*) AS vs_total FROM games group by victory_status ORDER BY vs_total DESC"
     victory_status_count = query(conn,victory_status_str)
@@ -229,8 +230,10 @@ def run_assignment(conn: sqlite3.Connection) -> None:
     win_rates = query(conn,win_rates_str)
     print(f"Win rate (%) for White, Black, and Draw across all games: {win_rates}")
     
-    # Make sure to use the function query we built above! -Hend
-
+    # Q5: For each victory_status, what is the average and max number of turns? Sort highest avg first.
+    max_turns_v_s_str= "SELECT victory_status, ROUND(AVG(turns),1) as turns_avg, MAX(turns) as turns_max from games GROUP BY victory_status ORDER BY turns_avg DESC"
+    max_turns = query(conn, max_turns_v_s_str)
+    print(f"The average and max number of turns: {max_turns}")
 
 def main():
     print("This is for session 6: testing databases")
