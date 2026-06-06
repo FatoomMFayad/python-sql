@@ -246,6 +246,10 @@ def run_assignment(conn: sqlite3.Connection) -> None:
     games_openings_join = query(conn, games_openings_join_str)
     print(f"The 5 most played openings with their full name: {games_openings_join}")
 
+    # Q8: LEFT JOIN players to games: find players who have never appeared as white_id
+    players_games_str = players_games_str = "SELECT COUNT(p.username) as cnt FROM players p LEFT JOIN games g ON p.username = g.white_id WHERE g.white_id IS NULL;"
+    players_games = query(conn, players_games_str)
+    print(f"players who have never appeared as white_id: {players_games}")
 def main():
     print("This is for session 6: testing databases")
 
