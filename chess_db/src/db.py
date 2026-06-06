@@ -209,7 +209,25 @@ def run_assignment(conn: sqlite3.Connection) -> None:
     rated_total = query(conn, rated_total_str)
     print(f"Total numbers of rated games: {rated_total['total_rated'][0]}")
 
-    
+    #Q2 List all distinct victory_status values and their counts.
+    victory_status_str = "SELECT DISTINCT victory_status, COUNT(*) AS vs_total FROM games group by victory_status ORDER BY vs_total DESC"
+    victory_status_count = query(conn,victory_status_str)
+    print(f"Distinct victory_status values and their counts: {victory_status_count}")
+
+    # Q3 The 10 games with the most turns. Show game_id, winner, turns.
+    most_turns_str = "SELECT game_id, winner, turns FROM games ORDER BY turns DESC LIMIT 10"
+    most_turns = query(conn,most_turns_str)
+    print(f"The 10 games with the most turns: {most_turns}")
+
+    # Q4: What is the win rate (%) for White, Black, and Draw across all games?
+    win_rates_str = """
+                SELECT winner, ROUND((COUNT(*) * 100.0) / (SELECT COUNT(*) FROM games), 2) || '%%' AS win_rate
+                FROM games 
+                GROUP BY winner
+                ORDER BY win_rate DESC;
+            """
+    win_rates = query(conn,win_rates_str)
+    print(f"Win rate (%) for White, Black, and Draw across all games: {win_rates}")
     
     # Make sure to use the function query we built above! -Hend
 
