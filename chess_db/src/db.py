@@ -236,9 +236,15 @@ def run_assignment(conn: sqlite3.Connection) -> None:
     print(f"The average and max number of turns: {max_turns}")
 
     # Q6: Which 5 opening_codes appear most frequently? Use HAVING to show only those with more than 500 games
-    opening_codes_str = "SELECT opening_code, COUNT(*) AS games_count FROM games GROUP BY opening_code HAVING games_count > 500 ORDER BY games_count DESC LIMIT 5;"
+    opening_codes_str = "SELECT opening_code , COUNT(*) AS games_count FROM games GROUP BY opening_code HAVING games_count > 500 ORDER BY games_count DESC LIMIT 5;"
     opening_codes = query(conn, opening_codes_str)
-    print(opening_codes)
+    print(f"5 opening_codes appear most frequently {opening_codes}")
+
+    # Stage 5
+    # Q7 JOIN games to openings — find the 5 most played openings with their full name
+    games_openings_join_str = "SELECT COUNT(*) AS most_played, o.opening_fullname || ' (' || o.opening_code || ')' AS full_name FROM games AS g LEFT JOIN openings AS o ON g.opening_code = o.opening_code GROUP BY g.opening_code, o.opening_fullname ORDER BY most_played DESC LIMIT 5;"    
+    games_openings_join = query(conn, games_openings_join_str)
+    print(f"The 5 most played openings with their full name: {games_openings_join}")
 
 def main():
     print("This is for session 6: testing databases")
