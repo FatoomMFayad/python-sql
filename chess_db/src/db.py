@@ -25,10 +25,29 @@ def create_schema(conn:sq.Connection)->None:
      players and openinings must exists before games,
      becuse games has FK references to both.
     """
-
+    #Drop in reverse FK dependency order so re-runs are clean
     conn.execute("DROP TABLE IF EXISTS games")
     conn.execute("DROP TABLE IF EXISTS openings")
     conn.execute("DROP TABLE IF EXISTS players")
+
+
+    # Players: are raw per unique player
+    conn.execute("""
+        CREATE TABLE players(
+                 username   TEXT    PRIMARY KEY NOT NULL,
+                 last_rating    INTEGER NOT NULL,
+                 total_games    INTEGER NOT NULL DEFAULT 0
+                 )
+    """)
+
+    # Openings: one row per unique opening code.
+    conn.execute("""
+        CREATE TABLE openings (
+            opening_code    TEXT PRIMARY KEY NOT NULL,
+            opening_shotname    TEXT NOT NULL,
+            opening_fullname    TEXT NOT NULL
+                 )
+    """)
 
 
 
