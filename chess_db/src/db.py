@@ -301,6 +301,20 @@ def run_assignment(conn: sqlite3.Connection) -> None:
     player_wins = query(conn, total_wins_str)
     print(f"Total wins per player: {player_wins}")
 
+    # Stage 5: Window functions
+    # Q11: for each game, add a column showing what RANK each game holds for that white player by white_rating (highest rating = rank 1). Show top 10 rows.
+    player_rating_rank_str = """
+                                SELECT 
+                                    white_id,
+                                    white_rating,
+                                    RANK() OVER (PARTITION BY white_id ORDER BY white_rating DESC) AS rating_rank
+                                FROM games
+                                ORDER BY white_id, rating_rank
+                                LIMIT 10;
+                            """
+    player_rating_rank = query(conn, player_rating_rank_str)
+    print(f"Top 10 white palyers: {player_rating_rank}")  
+                     
 def main():
     print("This is for session 6: testing databases")
 
