@@ -250,6 +250,30 @@ def run_assignment(conn: sqlite3.Connection) -> None:
     players_games_str = players_games_str = "SELECT COUNT(p.username) as cnt FROM players p LEFT JOIN games g ON p.username = g.white_id WHERE g.white_id IS NULL;"
     players_games = query(conn, players_games_str)
     print(f"players who have never appeared as white_id: {players_games}")
+
+    # Stage 4
+    # Q9: Using a CTE: compute total wins per player (as white). Return top 5
+    player_total_wins_str = """   
+            WITH white AS (
+                            SELECT username FROM players                            
+                        ),
+            win_counts AS (
+                            SELECT white_id, COUNT(*) AS n
+                            FROM games 
+                            WHERE winner = "White"
+                            GROUP BY white_id
+                        )
+            SELECT e.username, g.n
+            FROM white e JOIN win_counts g
+            ON e.username = g.white_id
+            ORDER BY g.n DESC
+            LIMIT 5;    
+                                            
+ """
+
+    player_total_wins = query(conn, player_total_wins_str)
+    
+    print(f"total wins per player (as white): {player_total_wins}")
 def main():
     print("This is for session 6: testing databases")
 
