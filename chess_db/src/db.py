@@ -314,7 +314,25 @@ def run_assignment(conn: sqlite3.Connection) -> None:
                             """
     player_rating_rank = query(conn, player_rating_rank_str)
     print(f"Top 10 white palyers: {player_rating_rank}")  
-                     
+    # Q12:LAG: show each game's white_rating and the previous game's white_rating for the same player. Filter to players with 5+ games
+    lag_rating_str = """
+            WITH GameStats AS (
+                SELECT 
+                    white_id,
+                    white_rating,
+                    COUNT(*) OVER (PARTITION BY white_id) AS total_games,
+                    LAG(white_rating) OVER (PARTITION BY white_id ORDER BY game_id) AS prev_white_rating
+                FROM games
+            )
+            SELECT 
+                white_id,
+                white_rating,
+                prev_white_rating
+            FROM GameStats
+            WHERE total_games >= 5;
+            """
+    lag_rating = query(conn, lag_rating_str)
+    print(f"Lag rating: {lag_rating}")
 def main():
     print("This is for session 6: testing databases")
 
