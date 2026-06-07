@@ -269,11 +269,38 @@ def run_assignment(conn: sqlite3.Connection) -> None:
             ORDER BY g.n DESC
             LIMIT 5;    
                                             
- """
-
-    player_total_wins = query(conn, player_total_wins_str)
-    
+    """
+    player_total_wins = query(conn, player_total_wins_str)    
     print(f"total wins per player (as white): {player_total_wins}")
+
+    # Q10: UNION CTE: combine white wins and black wins into one 'player_wins' table. Who has the most total wins?
+    total_wins_str = """
+                    WITH player_wins AS (
+                    -- Get all the wins where the player was White
+                    SELECT white_id AS username, 'White' AS win_color 
+                    FROM games 
+                    WHERE winner = 'White'
+    
+                    UNION ALL
+    
+                    -- Stack all the wins where the player was Black right underneath
+                    SELECT black_id AS username, 'Black' AS win_color 
+                    FROM games 
+                    WHERE winner = 'Black'
+                    )       
+                SELECT 
+                    username, 
+                    COUNT(*) AS total_wins, 
+                    ' (' || SUM(CASE WHEN win_color = 'Black' THEN 1 ELSE 0 END)|| ' black,' || 
+                    SUM(CASE WHEN win_color = 'White' THEN 1 ELSE 0 END) || ' white' || ')' AS details
+                FROM player_wins
+                GROUP BY username
+                ORDER BY total_wins DESC
+                LIMIT 5;
+    """
+    player_wins = query(conn, total_wins_str)
+    print(f"Total wins per player: {player_wins}")
+
 def main():
     print("This is for session 6: testing databases")
 
